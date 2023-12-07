@@ -1,5 +1,6 @@
 import { createStore } from "solid-js/store";
 import { createSignal, For } from "solid-js";
+import "./NewTaskModal.css";
 
 function NewTaskModal() {
     const [fields, setFields] = createStore();
@@ -33,17 +34,20 @@ function NewTaskModal() {
                         <div class="label">
                             <span class="label-text">Farbe</span>
                         </div>
-                        <input
-                            type="color"
-                            class="input input-bordered h-full"
-                            onInput={(e) => setFields("color", e.target.value)}
-                        />
+                        <div class="color-input-wrapper">
+                            <input
+                                type="color"
+                                onInput={(e) =>
+                                    setFields("color", e.target.value)
+                                }
+                            />
+                        </div>
                     </label>
                 </div>
 
                 <div class="flex flex-row mt-3">
                     <For each={presets()}>
-                        {(preset, i) => (
+                        {(preset) => (
                             <div
                                 class="badge me-2"
                                 style={"background-color: " + preset.color}
