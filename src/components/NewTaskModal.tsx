@@ -1,9 +1,10 @@
-import { createStore } from "solid-js/store";
 import { createSignal, For } from "solid-js";
+import { createStore } from "solid-js/store";
+
 import "./NewTaskModal.css";
 
-function NewTaskModal() {
-    const [fields, setFields] = createStore();
+function NewTaskModal(existingTask: Task) {
+    const [task, setTask] = createStore<Task>(existingTask);
 
     const [presets, setPresets] = createSignal([
         { name: "Preset 1", color: "#5534eb" },
@@ -12,6 +13,7 @@ function NewTaskModal() {
 
     const submitForm = () => {
         // form.submit()
+        console.log(task);
         console.log("Done");
     };
 
@@ -27,7 +29,7 @@ function NewTaskModal() {
                         <input
                             type="text"
                             class="input input-bordered w-11/12"
-                            onInput={(e) => setFields("name", e.target.value)}
+                            onInput={(e) => setTask("name", e.target.value)}
                         />
                     </label>
                     <label class="form-control w-1/2">
@@ -38,7 +40,7 @@ function NewTaskModal() {
                             <input
                                 type="color"
                                 onInput={(e) =>
-                                    setFields("color", e.target.value)
+                                    setTask("color", e.target.value)
                                 }
                             />
                         </div>
@@ -66,7 +68,7 @@ function NewTaskModal() {
                             type="datetime-local"
                             class="input input-bordered w-11/12"
                             onInput={(e) =>
-                                setFields("startDate", e.target.value)
+                                setTask("startDate", new Date(e.target.value))
                             }
                         />
                     </label>
@@ -78,7 +80,7 @@ function NewTaskModal() {
                             type="datetime-local"
                             class="input input-bordered w-11/12"
                             onInput={(e) =>
-                                setFields("endDate", e.target.value)
+                                setTask("endDate", new Date(e.target.value))
                             }
                         />
                     </label>
@@ -89,9 +91,7 @@ function NewTaskModal() {
                     </div>
                     <textarea
                         class="textarea textarea-bordered h-24"
-                        onInput={(e) =>
-                            setFields("description", e.target.value)
-                        }
+                        onInput={(e) => setTask("description", e.target.value)}
                     ></textarea>
                 </label>
 
