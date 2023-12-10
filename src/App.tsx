@@ -1,14 +1,17 @@
 import { createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 import logo from "./assets/logo.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import NewTaskModal from "./components/NewTaskModal";
+import NewTaskModal from "./components/TaskModal";
+
 
 function App() {
     const [greetMsg, setGreetMsg] = createSignal("");
     const [name, setName] = createSignal("");
+    const [state, setState] = createStore({ taskId: -1 } as State);
 
     async function greet() {
         // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -18,7 +21,7 @@ function App() {
     return (
         <div>
             <Navbar />
-            <NewTaskModal />
+            <NewTaskModal taskId={state.taskId}/>
             <h1>Welcome to Tauri!</h1>
 
             <div class="row">
@@ -34,7 +37,7 @@ function App() {
             </div>
 
             <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
-
+            <button onClick={() => setState("taskId", 0)}></button>
             <form
                 class="row"
                 onSubmit={(e) => {
@@ -52,6 +55,6 @@ function App() {
             <p>{greetMsg()}</p>
         </div>
     );
-}
+} 
 
 export default App;

@@ -1,0 +1,3 @@
+interface TaskModalI {
+    taskId: number;
+}
