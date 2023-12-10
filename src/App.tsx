@@ -5,7 +5,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 
 import Navbar from "./components/Navbar";
-import NewTaskModal from "./components/TaskModal";
+import TaskModal from "./components/TaskModal";
 
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
     return (
         <div>
             <Navbar />
-            <NewTaskModal taskId={state.taskId}/>
+            <TaskModal taskId={state.taskId}/>
             <h1>Welcome to Tauri!</h1>
 
             <div class="row">
@@ -37,7 +37,7 @@ function App() {
             </div>
 
             <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
-            <button onClick={() => setState("taskId", 0)}></button>
+            <button onClick={() => setState("taskId", 0)}>Load Fake existing Task</button>
             <form
                 class="row"
                 onSubmit={(e) => {
