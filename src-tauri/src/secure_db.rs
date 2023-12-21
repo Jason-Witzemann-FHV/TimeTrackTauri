@@ -31,5 +31,5 @@ fn db_file_exists() -> bool {
 // Get the path where the database file should be located.
 fn get_db_path() -> String {
     let home_dir = dirs::home_dir().unwrap();
-    home_dir.to_str().unwrap().to_string() + "/.config/timetracktauri/database.sqlite"
+    home_dir.to_str().unwrap().to_string() + "/.config/timetracktauri/database.secure"
 }
