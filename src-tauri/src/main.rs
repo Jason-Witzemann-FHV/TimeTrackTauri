@@ -15,7 +15,7 @@ struct Preset {
 #[derive(Serialize, Deserialize, Debug, TS, Clone)]
 #[ts(export, export_to = "../src/types/")]
 struct State {
-    task_id: i32,
+    tasks: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, TS, Clone)]
@@ -32,7 +32,8 @@ struct Task {
 #[derive(Serialize, Deserialize, Debug, TS, Clone)]
 #[ts(export, export_to = "../src/types/")]
 struct TaskModal {
-    task_id: i32,
+    task: Task,
+    presets: Vec<Preset>,
 }
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -195,6 +196,7 @@ fn main() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![get_all_presets])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

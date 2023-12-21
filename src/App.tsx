@@ -1,60 +1,41 @@
-import { createSignal } from "solid-js";
+import { createResource, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import logo from "./assets/logo.svg";
+
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 
 import Navbar from "./components/Navbar";
 import TaskModal from "./components/TaskModal";
 
+import { Task } from "./types/Task";
+import { Preset } from "./types/Preset";
+
+const fetchAllTasks = async () => await invoke("get_all_tasks");
+const fetchAllPresets = async () => await invoke("get_all_presets");
 
 function App() {
-    const [greetMsg, setGreetMsg] = createSignal("");
-    const [name, setName] = createSignal("");
-    const [state, setState] = createStore({ taskId: -1 } as State);
+    const [selectedTask, setSelectedTask] = createStore({
+        id: -1,
+        name: "Your nice taskname",
+        description: "Your awesome task description",
+        color: "#123456",
+        start_date: new Date().valueOf() + 3600000,
+        end_date: new Date().valueOf() + 3600000 * 2,
+    } as Task);
 
-    async function greet() {
-        // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-        setGreetMsg(await invoke("greet", { name: name() }));
-    }
+    const [presets] = createResource(fetchAllPresets);
+    const [tasks] = createResource(fetchAllTasks);
 
     return (
         <div>
             <Navbar />
-            <TaskModal taskId={state.taskId}/>
+            <TaskModal
+                loadedTask={selectedTask}
+                presets={presets() as Array<Preset>}
+            />
             <h1>Welcome to Tauri!</h1>
-
-            <div class="row">
-                <a href="https://vitejs.dev" target="_blank">
-                    <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-                </a>
-                <a href="https://tauri.app" target="_blank">
-                    <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-                </a>
-                <a href="https://solidjs.com" target="_blank">
-                    <img src={logo} class="logo solid" alt="Solid logo" />
-                </a>
-            </div>
-
-            <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
-            <button onClick={() => setState("taskId", 0)}>Load Fake existing Task</button>
-            <form
-                class="row"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    greet();
-                }}
-            >
-                <input
-                    id="greet-input"
-                    onChange={(e) => setName(e.currentTarget.value)}
-                    placeholder="Enter a name..."
-                />
-                <button type="submit">Greet</button>
-            </form>
-            <p>{greetMsg()}</p>
         </div>
     );
-} 
+}
 
 export default App;
