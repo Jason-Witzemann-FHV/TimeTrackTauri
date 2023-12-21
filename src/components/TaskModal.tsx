@@ -2,15 +2,15 @@ import { For } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import "./TaskModal.css";
-import { Task } from "../types/Task";
-import { TaskModalI } from "../types/TaskModal";
-import { Preset } from "../types/Preset";
+import { TaskI } from "../types/TaskI";
+import { TaskModalI } from "../types/TaskModalI";
+import { PresetI } from "../types/PresetI";
 import { invoke } from "@tauri-apps/api";
 
 function TaskModal(props: TaskModalI) {
-    const [task, setTask] = createStore<Task>(props.loadedTask);
+    const [task, setTask] = createStore<TaskI>(props.task);
 
-    function applyPreset(preset: Preset) {
+    function applyPreset(preset: PresetI) {
         setTask("color", preset.color);
         setTask("name", preset.name);
     }
