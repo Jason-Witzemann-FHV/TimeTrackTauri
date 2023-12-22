@@ -9,7 +9,12 @@ function TaskList(props: { tasks: TaskI[] }) {
         const groupedTasks: GroupedTaskI[] = [];
 
         tasks.forEach((task) => {
-            const date = new Date(task.start_date).toDateString();
+            const date = new Date(task.start_date).toLocaleDateString("de-DE", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            });
 
             if (groupedTasks.some((group) => group.date === date)) {
                 groupedTasks
@@ -23,6 +28,26 @@ function TaskList(props: { tasks: TaskI[] }) {
         return groupedTasks;
     }
 
+    function getTaskLabel(task: TaskI): string {
+        const start_date = new Date(task.start_date);
+        const end_date = new Date(task.end_date);
+
+        let label =
+            start_date.toLocaleTimeString("de-DE", {
+                hour: "numeric",
+                minute: "numeric",
+            }) +
+            " - " +
+            end_date.toLocaleTimeString("de-DE", {
+                hour: "numeric",
+                minute: "numeric",
+            }) +
+            " " +
+            task.name;
+
+        return label;
+    }
+
     return (
         <For each={groupTasksByDate(tasks())}>
             {(groupedTask) => (
@@ -34,7 +59,9 @@ function TaskList(props: { tasks: TaskI[] }) {
                     <div class="collapse-content">
                         <ul class="list-disc pl-4">
                             <For each={groupedTask.tasks}>
-                                {(task) => <li class="mb-2">{task.name}</li>}
+                                {(task) => (
+                                    <li class="mb-2">{getTaskLabel(task)}</li>
+                                )}
                             </For>
                         </ul>
                     </div>
