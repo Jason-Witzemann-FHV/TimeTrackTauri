@@ -1,4 +1,4 @@
-import { Show, createResource, createSignal } from "solid-js";
+import { Show, createResource, createSignal, onMount } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { invoke } from "@tauri-apps/api/tauri";
@@ -27,15 +27,26 @@ function App() {
     const [presets] = createResource(fetchAllPresets);
     const [tasks] = createResource(fetchAllTasks);
 
+    let taskModal: HTMLDialogElement;
+
+    function editTask(task: TaskI): void {
+        setSelectedTask(task);
+        taskModal.showModal();
+    }
+
     return (
         <div>
             <Navbar />
             <TaskModal
                 task={selectedTask}
                 presets={presets() as Array<PresetI>}
+                ref={taskModal}
             />
             <Show when={(tasks() as Array<TaskI>)?.length > 0}>
-                <TaskList tasks={tasks() as Array<TaskI>} />
+                <TaskList
+                    tasks={tasks() as Array<TaskI>}
+                    editTaskCall={editTask}
+                />
             </Show>
         </div>
     );

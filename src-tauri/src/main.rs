@@ -23,20 +23,6 @@ struct TaskI {
     description: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, TS, Clone)]
-#[ts(export, export_to = "../src/types/")]
-struct GroupedTaskI {
-    date: String,
-    tasks: Vec<TaskI>,
-}
-
-#[derive(Serialize, Deserialize, Debug, TS, Clone)]
-#[ts(export, export_to = "../src/types/")]
-struct TaskModalI {
-    task: TaskI,
-    presets: Vec<PresetI>,
-}
-
 struct TaskList(Vec<TaskI>);
 struct PresetList(Vec<PresetI>);
 
@@ -112,8 +98,8 @@ fn get_all_tasks() -> Vec<TaskI> {
         id: 5,
         name: "Task 5".to_string(),
         color: "#ff00ff".to_string(),
-        start_date: 0,
-        end_date: 0,
+        start_date: 1703236200000,
+        end_date: 1703249400000,
         description: "This is yet another task".to_string(),
     };
     task_list.add(task);

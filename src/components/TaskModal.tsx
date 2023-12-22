@@ -20,7 +20,7 @@ function TaskModal(props: TaskModalI) {
     }
 
     return (
-        <dialog id="newTaskModal" class="modal">
+        <dialog id="newTaskModal" class="modal" ref={props.ref}>
             <form onSubmit={submitForm} class="modal-box">
                 <h3 class="font-bold text-lg">
                     {task.id === -1 ? "Create new task" : "Edit task"}

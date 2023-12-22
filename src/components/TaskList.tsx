@@ -2,30 +2,47 @@ import { For, createSignal } from "solid-js";
 import { TaskI } from "../types/TaskI";
 import { GroupedTaskI } from "../types/GroupedTaskI";
 
-function TaskList(props: { tasks: TaskI[] }) {
+function TaskList(props: {
+    tasks: TaskI[];
+    editTaskCall: (task: TaskI) => void;
+}) {
     const [tasks, setTasks] = createSignal(props.tasks);
 
-    function groupTasksByDate(tasks: TaskI[]): GroupedTaskI[] {
-        const groupedTasks: GroupedTaskI[] = [];
+    function groupTasksByDay(tasks: TaskI[]): GroupedTaskI[] {
+        const groupedTasks: GroupedTaskI[] = tasks.reduce(
+            (acc: GroupedTaskI[], task: TaskI) => {
+                const date = new Date(task.start_date);
+                date.setHours(0, 0, 0, 0);
 
-        tasks.forEach((task) => {
-            const date = new Date(task.start_date).toLocaleDateString("de-DE", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            });
+                const existingGroup = acc.find(
+                    (group) => group.date.getTime() === date.getTime()
+                );
+                if (existingGroup) {
+                    existingGroup.tasks.push(task);
+                } else {
+                    acc.push({ date, tasks: [task] });
+                }
 
-            if (groupedTasks.some((group) => group.date === date)) {
-                groupedTasks
-                    .find((group) => group.date === date)
-                    ?.tasks.push(task);
-            } else {
-                groupedTasks.push({ date: date, tasks: [task] });
-            }
-        });
+                return acc;
+            },
+            []
+        );
+
+        groupedTasks.sort(
+            (a: GroupedTaskI, b: GroupedTaskI) =>
+                b.date.getTime() - a.date.getTime()
+        );
 
         return groupedTasks;
+    }
+
+    function getDayLabel(date: Date): string {
+        return date.toLocaleDateString("de-DE", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
     }
 
     function getTaskLabel(task: TaskI): string {
@@ -48,19 +65,42 @@ function TaskList(props: { tasks: TaskI[] }) {
         return label;
     }
 
+    function isTodaysGroupedTask(groupedTask: GroupedTaskI): boolean {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return groupedTask.date.getTime() === today.getTime();
+    }
+
     return (
-        <For each={groupTasksByDate(tasks())}>
+        <For each={groupTasksByDay(tasks())}>
             {(groupedTask) => (
-                <div class="collapse collapse-arrow border mt-2">
+                <div
+                    class={
+                        isTodaysGroupedTask(groupedTask)
+                            ? "collapse collapse-open collapse-arrow border mt-2"
+                            : "collapse collapse-arrow border mt-2"
+                    }
+                >
                     <input type="checkbox" />
-                    <div class="collapse-title text-xl font-medium">
-                        {groupedTask.date}
+                    <div class="collapse-title text-xl font-medium ">
+                        {getDayLabel(groupedTask.date)}
                     </div>
                     <div class="collapse-content">
                         <ul class="list-disc pl-4">
                             <For each={groupedTask.tasks}>
                                 {(task) => (
-                                    <li class="mb-2">{getTaskLabel(task)}</li>
+                                    <li class="mb-2">
+                                        {getTaskLabel(task)}
+                                        <button
+                                            class="btn btn-sm ml-2"
+                                            onclick={() =>
+                                                props.editTaskCall(task)
+                                            }
+                                        >
+                                            Edit
+                                        </button>
+                                    </li>
                                 )}
                             </For>
                         </ul>
