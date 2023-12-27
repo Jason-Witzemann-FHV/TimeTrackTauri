@@ -26,7 +26,7 @@ function App() {
 
     const [presets] = createResource(fetchAllPresets);
     const [tasks] = createResource(fetchAllTasks);
-    const [filteredTasks, setFilteredTasks] = createSignal<Array<TaskI>>();
+    const [filteredTasks, setFilteredTasks] = createSignal<Array<TaskI>>([]);
 
     let taskModal: HTMLDialogElement;
 
@@ -58,7 +58,7 @@ function App() {
             />
             <Show when={(tasks() as Array<TaskI>)?.length > 0}>
                 <TaskList
-                    tasks={filteredTasks()?.length > 0 ? filteredTasks() : tasks() as Array<TaskI>}
+                    tasks={filteredTasks().length > 0 ? filteredTasks() : tasks() as Array<TaskI>}
                     editTaskCall={editTask}
                 />
             </Show>
