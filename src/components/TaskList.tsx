@@ -5,8 +5,11 @@ import { GroupedTaskI } from "../types/GroupedTaskI";
 function TaskList(props: {
     tasks: TaskI[];
     editTaskCall: (task: TaskI) => void;
+    isFiltered: boolean;
 }) {
-    const [groupedTasks, setGroupedTasks] = createSignal<Array<GroupedTaskI>>([]);
+    const [groupedTasks, setGroupedTasks] = createSignal<Array<GroupedTaskI>>(
+        []
+    );
 
     function groupTasksByDay(tasks: TaskI[]): Array<GroupedTaskI> {
         const groupedTasks: GroupedTaskI[] = tasks.reduce(
@@ -65,11 +68,13 @@ function TaskList(props: {
         return label;
     }
 
-    function isTodaysGroupedTask(groupedTask: GroupedTaskI): boolean {
+    function openGroupedTask(groupedTask: GroupedTaskI): boolean {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        return groupedTask.date.getTime() === today.getTime();
+        return (
+            groupedTask.date.getTime() === today.getTime() || props.isFiltered
+        );
     }
 
     createEffect(() => {
@@ -81,7 +86,7 @@ function TaskList(props: {
             {(groupedTask) => (
                 <div
                     class={
-                        isTodaysGroupedTask(groupedTask)
+                        openGroupedTask(groupedTask)
                             ? "collapse collapse-open collapse-arrow border mt-2"
                             : "collapse collapse-arrow border mt-2"
                     }

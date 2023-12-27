@@ -38,7 +38,7 @@ function App() {
 
     function applyFilter(filter: String): void {
         if (filter === "") {
-            setFilteredTasks(tasks() as Array<TaskI>);
+            setFilteredTasks([]);
             return;
         }
 
@@ -62,8 +62,13 @@ function App() {
             </Show>
             <Show when={(tasks() as Array<TaskI>)?.length > 0}>
                 <TaskList
-                    tasks={filteredTasks().length > 0 ? filteredTasks() : tasks() as Array<TaskI>}
+                    tasks={
+                        filteredTasks().length > 0
+                            ? filteredTasks()
+                            : (tasks() as Array<TaskI>)
+                    }
                     editTaskCall={editTask}
+                    isFiltered={filteredTasks().length > 0}
                 />
             </Show>
         </div>
