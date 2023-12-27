@@ -1,4 +1,4 @@
-import { For, createSignal } from "solid-js";
+import { For, createEffect, createSignal } from "solid-js";
 import { TaskI } from "../types/TaskI";
 import { GroupedTaskI } from "../types/GroupedTaskI";
 
@@ -6,9 +6,9 @@ function TaskList(props: {
     tasks: TaskI[];
     editTaskCall: (task: TaskI) => void;
 }) {
-    const [tasks, setTasks] = createSignal(props.tasks);
+    const [groupedTasks, setGroupedTasks] = createSignal<Array<GroupedTaskI>>([]);
 
-    function groupTasksByDay(tasks: TaskI[]): GroupedTaskI[] {
+    function groupTasksByDay(tasks: TaskI[]): Array<GroupedTaskI> {
         const groupedTasks: GroupedTaskI[] = tasks.reduce(
             (acc: GroupedTaskI[], task: TaskI) => {
                 const date = new Date(task.start_date);
@@ -72,8 +72,12 @@ function TaskList(props: {
         return groupedTask.date.getTime() === today.getTime();
     }
 
+    createEffect(() => {
+        setGroupedTasks(groupTasksByDay(props.tasks));
+    });
+
     return (
-        <For each={groupTasksByDay(tasks())}>
+        <For each={groupedTasks()}>
             {(groupedTask) => (
                 <div
                     class={

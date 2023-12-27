@@ -1,13 +1,9 @@
-import { createSignal } from "solid-js";
-
-function Navbar() {
-    const [searchTerm, setSearchTerm] = createSignal("");
-
+function Navbar(props: {filterCall: (filter: String) => void}) {
     return (
         <div class="navbar bg-base-100">
             <div class="flex-1">
                 <input
-                    onChange={(e) => setSearchTerm(e.currentTarget.value)}
+                    onInput={(e) => props.filterCall(e.currentTarget.value)}
                     type="text"
                     placeholder="Search"
                     class="input input-bordered w-3/4"

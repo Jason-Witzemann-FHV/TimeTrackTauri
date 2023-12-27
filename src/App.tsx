@@ -26,6 +26,7 @@ function App() {
 
     const [presets] = createResource(fetchAllPresets);
     const [tasks] = createResource(fetchAllTasks);
+    const [filteredTasks, setFilteredTasks] = createSignal<Array<TaskI>>();
 
     let taskModal: HTMLDialogElement;
 
@@ -34,9 +35,22 @@ function App() {
         taskModal.showModal();
     }
 
+    function applyFilter(filter: string): void {
+        if (filter === "") {
+            setFilteredTasks(tasks() as Array<TaskI>);
+            return;
+        }
+
+        const filtered = (tasks() as Array<TaskI>).filter((task) =>
+            task.name.toLowerCase().includes(filter.toLowerCase())
+        );
+        console.log(filtered);
+        setFilteredTasks(filtered);
+    }
+
     return (
         <div>
-            <Navbar />
+            <Navbar filterCall={applyFilter}/>
             <TaskModal
                 task={selectedTask}
                 presets={presets() as Array<PresetI>}
@@ -44,7 +58,7 @@ function App() {
             />
             <Show when={(tasks() as Array<TaskI>)?.length > 0}>
                 <TaskList
-                    tasks={tasks() as Array<TaskI>}
+                    tasks={filteredTasks()?.length > 0 ? filteredTasks() : tasks() as Array<TaskI>}
                     editTaskCall={editTask}
                 />
             </Show>

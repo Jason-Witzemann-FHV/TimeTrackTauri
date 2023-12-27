@@ -60,7 +60,7 @@ fn get_all_tasks() -> Vec<TaskI> {
     print!("Hello world");
     let task = TaskI {
         id: 1,
-        name: "Task 1".to_string(),
+        name: "Auto fahren".to_string(),
         color: "#ff0000".to_string(),
         start_date: 1703149200000,
         end_date: 1703152800000,
@@ -69,7 +69,7 @@ fn get_all_tasks() -> Vec<TaskI> {
     task_list.add(task);
     let task = TaskI {
         id: 2,
-        name: "Task 2".to_string(),
+        name: "Kunden beraten".to_string(),
         color: "#00ff00".to_string(),
         start_date: 1703152800000,
         end_date: 1703163600000,
@@ -78,7 +78,7 @@ fn get_all_tasks() -> Vec<TaskI> {
     task_list.add(task);
     let task = TaskI {
         id: 3,
-        name: "Task 3".to_string(),
+        name: "Drucker einrichten".to_string(),
         color: "#0000ff".to_string(),
         start_date: 1702904400000,
         end_date: 1702911600000,
