@@ -1,6 +1,7 @@
 import { For, createEffect, createSignal } from "solid-js";
 import { TaskI } from "../types/TaskI";
 import { GroupedTaskI } from "../types/GroupedTaskI";
+import { invoke } from "@tauri-apps/api";
 
 function TaskList(props: {
     tasks: TaskI[];
@@ -108,6 +109,16 @@ function TaskList(props: {
                                             }
                                         >
                                             Edit
+                                        </button>
+                                        <button
+                                            class="btn btn-sm ml-2"
+                                            onclick={() =>
+                                                invoke("delete_task", {
+                                                    id: task.id,
+                                                })
+                                            }
+                                        >
+                                            Delete
                                         </button>
                                     </li>
                                 )}
