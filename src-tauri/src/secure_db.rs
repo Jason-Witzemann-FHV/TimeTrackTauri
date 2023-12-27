@@ -3,8 +3,8 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 
-use crate::Preset;
-use crate::Task;
+use crate::PresetI;
+use crate::TaskI;
 
 // Check if a database file exists, and create one if it does not.
 pub fn init() {
@@ -39,7 +39,7 @@ fn get_db_path() -> String {
     home_dir.to_str().unwrap().to_string() + "/.config/timetracktauri/database.secure"
 }
 
-fn write_to_db(tasks: Vec<Task>, presets: Vec<Preset>) {
+fn write_to_db(tasks: Vec<TaskI>, presets: Vec<PresetI>) {
     let mut data_file = OpenOptions::new()
         .append(true)
         .open(get_db_path())

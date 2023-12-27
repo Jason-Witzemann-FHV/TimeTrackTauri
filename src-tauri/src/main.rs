@@ -171,7 +171,7 @@ fn get_all_presets() -> Vec<PresetI> {
 }
 
 #[tauri::command]
-fn save_all_presets(presets: Vec<Preset>) {
+fn save_all_presets(presets: Vec<PresetI>) {
     println!("Saving presets");
     for preset in presets.iter() {
         println!("Preset: {}", preset.name);
