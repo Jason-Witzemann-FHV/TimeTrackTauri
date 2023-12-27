@@ -1,4 +1,4 @@
-import { Show, createResource, createSignal, onMount } from "solid-js";
+import { Show, createResource, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { invoke } from "@tauri-apps/api/tauri";
@@ -10,6 +10,7 @@ import TaskList from "./components/TaskList";
 
 import { TaskI } from "./types/TaskI";
 import { PresetI } from "./types/PresetI";
+import PresetModal from "./components/PresetModal";
 
 const fetchAllTasks = async () => await invoke("get_all_tasks");
 const fetchAllPresets = async () => await invoke("get_all_presets");
@@ -35,7 +36,7 @@ function App() {
         taskModal.showModal();
     }
 
-    function applyFilter(filter: string): void {
+    function applyFilter(filter: String): void {
         if (filter === "") {
             setFilteredTasks(tasks() as Array<TaskI>);
             return;
@@ -50,12 +51,15 @@ function App() {
 
     return (
         <div>
-            <Navbar filterCall={applyFilter}/>
+            <Navbar filterCall={applyFilter} />
             <TaskModal
                 task={selectedTask}
                 presets={presets() as Array<PresetI>}
                 ref={taskModal}
             />
+            <Show when={(presets() as Array<PresetI>)?.length > 0}>
+                <PresetModal presets={presets() as Array<PresetI>} />
+            </Show>
             <Show when={(tasks() as Array<TaskI>)?.length > 0}>
                 <TaskList
                     tasks={filteredTasks().length > 0 ? filteredTasks() : tasks() as Array<TaskI>}

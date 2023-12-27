@@ -1,4 +1,4 @@
-function Navbar(props: {filterCall: (filter: String) => void}) {
+function Navbar(props: { filterCall: (filter: String) => void }) {
     return (
         <div class="navbar bg-base-100">
             <div class="flex-1">
@@ -10,7 +10,7 @@ function Navbar(props: {filterCall: (filter: String) => void}) {
                 />
             </div>
             <div class="flex-2 gap-1">
-                <button class="btn">
+                <button class="btn" onclick="presetModal.showModal()">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

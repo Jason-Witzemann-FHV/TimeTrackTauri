@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import "./TaskModal.css";
+import "../App.css";
 import { TaskI } from "../types/TaskI";
 import { TaskModalI } from "../types/TaskModalI";
 import { PresetI } from "../types/PresetI";
