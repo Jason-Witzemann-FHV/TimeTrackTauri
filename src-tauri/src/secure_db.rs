@@ -1,5 +1,10 @@
 use std::fs;
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::Path;
+
+use crate::Preset;
+use crate::Task;
 
 // Check if a database file exists, and create one if it does not.
 pub fn init() {
@@ -32,4 +37,19 @@ fn db_file_exists() -> bool {
 fn get_db_path() -> String {
     let home_dir = dirs::home_dir().unwrap();
     home_dir.to_str().unwrap().to_string() + "/.config/timetracktauri/database.secure"
+}
+
+fn write_to_db(tasks: Vec<Task>, presets: Vec<Preset>) {
+    let mut data_file = OpenOptions::new()
+        .append(true)
+        .open(get_db_path())
+        .expect("cannot open file");
+
+    //for loop
+    for task in tasks.iter() {
+        let json_string = serde_json::to_string(task).unwrap();
+        data_file
+            .write(json_string.as_bytes())
+            .expect("cannot write to file");
+    }
 }

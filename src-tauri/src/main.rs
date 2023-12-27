@@ -170,6 +170,14 @@ fn get_all_presets() -> Vec<PresetI> {
     return preset_list.0;
 }
 
+#[tauri::command]
+fn save_all_presets(presets: Vec<Preset>) {
+    println!("Saving presets");
+    for preset in presets.iter() {
+        println!("Preset: {}", preset.name);
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .setup(|_app| {
