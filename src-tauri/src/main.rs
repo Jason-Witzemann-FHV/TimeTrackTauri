@@ -56,6 +56,9 @@ impl PresetList {
 
 #[tauri::command]
 fn get_all_tasks() -> Vec<TaskI> {
+    secure_db::read_task_db()
+
+    /*
     let mut task_list = TaskList::new();
     print!("Hello world");
     let task = TaskI {
@@ -121,12 +124,14 @@ fn get_all_tasks() -> Vec<TaskI> {
         description: "This is yet another task".to_string(),
     };
     task_list.add(task);
-    return task_list.0;
+    return task_list.0;*/
 }
 
 #[tauri::command]
 fn get_all_presets() -> Vec<PresetI> {
-    let mut preset_list = PresetList::new();
+    secure_db::read_preset_db()
+
+    /*let mut preset_list = PresetList::new();
     let preset = PresetI {
         name: "Preset 1".to_string(),
         color: "#ff0000".to_string(),
@@ -167,15 +172,46 @@ fn get_all_presets() -> Vec<PresetI> {
         color: "#000000".to_string(),
     };
     preset_list.add(preset);
-    return preset_list.0;
+    return preset_list.0;*/
 }
 
 #[tauri::command]
 fn save_all_presets(presets: Vec<PresetI>) {
-    println!("Saving presets");
-    for preset in presets.iter() {
-        println!("Preset: {}", preset.name);
+    secure_db::write_preset_db(&presets);
+}
+
+#[tauri::command]
+fn save_task(task: TaskI) {
+    let mut task_list = secure_db::read_task_db();
+
+    // check if task already exists. If so, replace it. If not, add it.
+    let mut task_exists = false;
+    for i in 0..task_list.len() {
+        if task_list[i].id == task.id {
+            task_list[i] = task.clone();
+            task_exists = true;
+            break;
+        }
     }
+    if !task_exists {
+        task_list.push(task);
+    }
+
+    secure_db::write_task_db(&task_list);
+}
+
+#[tauri::command]
+fn delete_task(id: i32) {
+    let mut task_list = secure_db::read_task_db();
+
+    // check if task exists and remove it.
+    for i in 0..task_list.len() {
+        if task_list[i].id == id {
+            task_list.remove(i);
+            break;
+        }
+    }
+    secure_db::write_task_db(&task_list);
 }
 
 fn main() {
@@ -185,7 +221,13 @@ fn main() {
             secure_db::init();
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_all_presets, get_all_tasks])
+        .invoke_handler(tauri::generate_handler![
+            get_all_presets,
+            get_all_tasks,
+            save_all_presets,
+            save_task,
+            delete_task
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
