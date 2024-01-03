@@ -1,4 +1,4 @@
-import { Show, createResource, createSignal } from "solid-js";
+import { Show, createEffect, createResource, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { invoke } from "@tauri-apps/api/tauri";
@@ -17,7 +17,7 @@ const fetchAllPresets = async () => await invoke("get_all_presets");
 
 function App() {
     const [selectedTask, setSelectedTask] = createStore<TaskI>({
-        id: -1,
+        id: 1,
         name: "Your nice taskname",
         description: "Your awesome task description",
         color: "#123456",
@@ -29,7 +29,24 @@ function App() {
     const [tasks] = createResource(fetchAllTasks);
     const [filteredTasks, setFilteredTasks] = createSignal<Array<TaskI>>([]);
 
+    createEffect(() => {
+        if (tasks() && (tasks() as Array<TaskI>).length > 0) {
+            setNewTaskId();
+        }
+    });
+
     let taskModal: HTMLDialogElement;
+
+    function setNewTaskId(): void {
+        const newTaskId = (tasks() as Array<TaskI>).reduce((acc, task) => {
+            if (task.id > acc) {
+                return task.id + 1;
+            }
+            return acc;
+        }, 0);
+
+        setSelectedTask("id", newTaskId + 1);
+    }
 
     function editTask(task: TaskI): void {
         setSelectedTask(task);
