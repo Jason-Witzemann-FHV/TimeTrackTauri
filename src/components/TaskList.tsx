@@ -82,6 +82,11 @@ function TaskList(props: {
         setGroupedTasks(groupTasksByDay(props.tasks));
     });
 
+    function deleteTask(id: number): void {
+        invoke("delete_task", { id: id });
+        location.reload();
+    }
+
     return (
         <For each={groupedTasks()}>
             {(groupedTask) => (
@@ -112,11 +117,7 @@ function TaskList(props: {
                                         </button>
                                         <button
                                             class="btn btn-sm ml-2"
-                                            onclick={() =>
-                                                invoke("delete_task", {
-                                                    id: task.id,
-                                                })
-                                            }
+                                            onclick={() => deleteTask(task.id)}
                                         >
                                             Delete
                                         </button>

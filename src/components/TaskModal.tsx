@@ -116,7 +116,9 @@ function TaskModal(props: TaskModalI) {
                 </label>
 
                 <div class="modal-action">
-                    <button class="btn">Close</button>
+                    <div class="btn" onClick="newTaskModal.close()">
+                        Close
+                    </div>
                     <button type="submit" class="btn">
                         Save
                     </button>
