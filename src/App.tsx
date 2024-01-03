@@ -74,10 +74,10 @@ function App() {
                 presets={presets() as Array<PresetI>}
                 ref={taskModal}
             />
-            <Show when={(presets() as Array<PresetI>)?.length > 0}>
+            <Show when={presets()}>
                 <PresetModal presets={presets() as Array<PresetI>} />
             </Show>
-            <Show when={(tasks() as Array<TaskI>)?.length > 0}>
+            <Show when={tasks()}>
                 <TaskList
                     tasks={
                         filteredTasks().length > 0
