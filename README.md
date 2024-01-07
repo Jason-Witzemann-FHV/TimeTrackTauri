@@ -12,3 +12,8 @@ This template should help get you started developing with Tauri, Solid and Types
 cd ./src-tauri/
 cargo test
 ```
+
+# Building project
+```bash
+npm run tauri build --release
+```
