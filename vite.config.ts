@@ -22,4 +22,8 @@ export default defineConfig(async () => ({
     minify: process.env.TAURI_DEBUG ? true : false,
     sourcemap: !!process.env.TAURI_DEBUG,
   },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+  },
 }));

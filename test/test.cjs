@@ -18,7 +18,6 @@ const releaseApp = path.resolve(
   'release',
   onWindows ? `timetracktauri.exe` : 'timetracktauri'
 );
-
 // keep track of the webdriver instance we create, and tauri-driver process we start
 let driver, tauriDriver;
 
@@ -59,18 +58,32 @@ before(async function () {
   // set timeout to 2 minutes to allow the program to build if it needs to
   this.timeout(120_000);
 
-  
+  // ensure the frontend has been built
+  const tmpDir = mkdtempSync(path.join(tmpdir(), 'vite-cache'));
+  rmdirSync(tmpDir);
+  try {
+    renameSync(frontendBuild, tmpDir);
+  } catch (error) { }
+
   console.log('INFO: building frontend');
   const frontend_build_result = spawnSync(onWindows ? 'npm.cmd': 'npm', ['run','build'], { cwd: projectRoot, stdio: 'pipe', encoding: 'utf-8' });
   console.log(frontend_build_result.stderr);
   if (frontend_build_result.error !== undefined) {
     console.log(frontend_build_result.error);
     rmdirSync(frontendBuild, { recursive: true });
-    renameSync(tmpdir, frontendBuild);
+    renameSync(tmpDir, frontendBuild);
     process.exit(frontend_build_result.errno);
   }
-  console.log('INFO: frontend built');
-  /*
+  // check if frontend wasn't updated
+  if (await dircmp(frontendBuild, tmpDir)) {
+    console.log('INFO: frontend built; using previous frontend build to speed up rust build');
+    rmSync(frontendBuild, { recursive: true, force: true });
+    // bring back previous build so that program builds faster
+    renameSync(tmpDir, frontendBuild);
+  } else {
+    console.log('INFO: frontend built');
+    rmSync(tmpDir, { recursive: true, force: true });
+  }
   // ensure the release app has been built
   console.log('INFO: building program (rust)');
   const cargo_build_result = spawnSync(onWindows ? 'npm.cmd': 'npm', ['run','tauri','build', '--release'], { cwd: srcTauri, stdio: 'pipe', encoding: 'utf-8' });
@@ -84,25 +97,20 @@ before(async function () {
   // start tauri-driver
   tauriDriver = spawn(
     path.resolve(homedir(), '.cargo', 'bin', 'tauri-driver'),
-    ['--port', '1420'],
+    ['--port','1420'],
     { stdio: [null, process.stdout, process.stderr] }
   )
-  */
-  const test = spawn('npm.cmd', ['start',], { cwd: srcTauri, stdio: 'pipe', encoding: 'utf-8' });
+  //const test = spawnSync('npm.cmd', ['start',], { cwd: srcTauri, stdio: 'pipe', encoding: 'utf-8' });
+
   const capabilities = new Capabilities();
   capabilities.set('tauri:options', { application: releaseApp });
   capabilities.setBrowserName('chrome');
 
-  async function getDriver() {
-    await new Promise(resolve => setTimeout(resolve, 10000));
-    return new Builder()
-    .usingServer(`localhost:1420`)
-    .forBrowser('chrome')
-    .build();;
-  }
   // start the webdriver client
-  driver = await getDriver();
-  console.log('INFO: webdriver client started');
+  driver = await new Builder()
+    .withCapabilities(capabilities)
+    .usingServer(`http://localhost:1420/`)
+    .build();
 })
 
 after(async () => {
