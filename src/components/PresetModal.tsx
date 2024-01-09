@@ -55,7 +55,7 @@ function PresetModal(props: { presets: Array<PresetI> }) {
                                 </div>
                             </label>
                             <button
-                                class="btn btn-sm mt-2"
+                                class="btn btn-sm ms-2"
                                 onClick={(event) => {
                                     removePreset(i);
                                     event.preventDefault();
