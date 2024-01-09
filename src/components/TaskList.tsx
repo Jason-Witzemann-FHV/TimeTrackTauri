@@ -108,7 +108,7 @@ function TaskList(props: {
                                     <li class="mb-2">
                                         {getTaskLabel(task)}
                                         <button
-                                            class="btn btn-sm ml-2"
+                                            class="btn btn-sm ml-2 btn-edit"
                                             onclick={() =>
                                                 props.editTaskCall(task)
                                             }
@@ -116,7 +116,7 @@ function TaskList(props: {
                                             Edit
                                         </button>
                                         <button
-                                            class="btn btn-sm ml-2"
+                                            class="btn btn-sm ml-2 btn-edit"
                                             onclick={() => deleteTask(task.id)}
                                         >
                                             Delete
