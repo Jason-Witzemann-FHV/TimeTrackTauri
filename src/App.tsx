@@ -28,6 +28,7 @@ function App() {
     const [presets] = createResource(fetchAllPresets);
     const [tasks] = createResource(fetchAllTasks);
     const [filteredTasks, setFilteredTasks] = createSignal<Array<TaskI>>([]);
+    const [isFiltered, setIsFiltered] = createSignal(false);
 
     createEffect(() => {
         if (tasks() && (tasks() as Array<TaskI>).length > 0) {
@@ -56,13 +57,28 @@ function App() {
     function applyFilter(filter: String): void {
         if (filter === "") {
             setFilteredTasks([]);
+            setIsFiltered(false);
+            return;
+        }
+        setIsFiltered(true);
+
+        if (filter.startsWith("date: ")) {
+            const date = new Date(filter.split("date: ")[1]);
+            date.setHours(0, 0, 0, 0);
+            console.log(date)
+
+            const filtered = (tasks() as Array<TaskI>).filter((task) => {
+                const taskDate = new Date(task.start_date);
+                taskDate.setHours(0, 0, 0, 0);
+                return taskDate.getTime() === date.getTime();
+            });
+            setFilteredTasks(filtered);
             return;
         }
 
         const filtered = (tasks() as Array<TaskI>).filter((task) =>
             task.name.toLowerCase().includes(filter.toLowerCase())
         );
-        console.log(filtered);
         setFilteredTasks(filtered);
     }
 
@@ -80,13 +96,19 @@ function App() {
             <Show when={tasks()}>
                 <TaskList
                     tasks={
-                        filteredTasks().length > 0
+                        isFiltered()
                             ? filteredTasks()
                             : (tasks() as Array<TaskI>)
                     }
                     editTaskCall={editTask}
-                    isFiltered={filteredTasks().length > 0}
+                    isFiltered={isFiltered()}
                 />
+            </Show>
+            <Show when={isFiltered() && filteredTasks().length == 0}>
+                <div role="alert" class="alert alert-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span>Couldn't find any task with the current search term! <br/><b>Tip:</b> Search for 'date: YYYY-MM-DD' to filter by date</span>
+                </div>
             </Show>
         </div>
     );

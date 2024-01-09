@@ -10,7 +10,6 @@ function PresetModal(props: { presets: Array<PresetI> }) {
     const [presets, setPresets] = createStore<Array<PresetI>>(props.presets);
 
     async function submitForm(): Promise<void> {
-        console.log(presets);
         await invoke("save_all_presets", { presets: presets });
     }
 

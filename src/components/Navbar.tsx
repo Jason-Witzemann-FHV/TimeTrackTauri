@@ -1,9 +1,25 @@
+import { Show, createSignal } from "solid-js";
+
 function Navbar(props: { filterCall: (filter: String) => void }) {
+    const [isDateSearch, setIsDateSearch] = createSignal(false);
+
+    function filterInputChanged(searchTerm: String): void {
+        props.filterCall(searchTerm);
+        if(searchTerm.startsWith("date: ")) {
+            setIsDateSearch(true);
+            return;
+        }
+        setIsDateSearch(false);
+    }
+
     return (
         <div class="navbar bg-base-100">
             <div class="flex-1">
+                <Show when={isDateSearch()}>
+                    <div class="badge badge-primary ms-1" style="position: absolute;">Date:</div>
+                </Show>
                 <input
-                    onInput={(e) => props.filterCall(e.currentTarget.value)}
+                    onInput={(e) => filterInputChanged(e.currentTarget.value)}
                     type="text"
                     placeholder="Search"
                     class="input input-bordered w-3/4"
