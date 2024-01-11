@@ -6,7 +6,6 @@ import { TaskI } from "../types/TaskI";
 import { TaskModalI } from "../types/TaskModalI";
 import { PresetI } from "../types/PresetI";
 import { invoke } from "@tauri-apps/api";
-import moment from "moment";
 import dayjs from "dayjs";
 
 function TaskModal(props: TaskModalI) {
