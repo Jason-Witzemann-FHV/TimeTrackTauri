@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import "../App.css";
@@ -6,6 +6,8 @@ import { TaskI } from "../types/TaskI";
 import { TaskModalI } from "../types/TaskModalI";
 import { PresetI } from "../types/PresetI";
 import { invoke } from "@tauri-apps/api";
+import moment from "moment";
+import dayjs from "dayjs";
 
 function TaskModal(props: TaskModalI) {
     const [task, setTask] = createStore<TaskI>(props.task);
@@ -15,7 +17,7 @@ function TaskModal(props: TaskModalI) {
         setTask("name", preset.name);
     }
 
-    async function submitForm(): Promise<void> {
+    async function submitForm(e: Event): Promise<void> {
         await invoke("save_task", { task: task });
     }
 
@@ -74,13 +76,13 @@ function TaskModal(props: TaskModalI) {
                         <input
                             type="datetime-local"
                             class="input input-bordered w-11/12"
-                            value={new Date(task.start_date)
-                                .toISOString()
-                                .slice(0, 16)}
-                            onInput={(e) =>
+                            value={dayjs(task.start_date).format(
+                                "YYYY-MM-DDThh:mm"
+                            )}
+                            onFocusOut={(e) =>
                                 setTask(
                                     "start_date",
-                                    new Date(e.target.value).valueOf()
+                                    new Date(e.target.value).toString()
                                 )
                             }
                         />
@@ -92,13 +94,13 @@ function TaskModal(props: TaskModalI) {
                         <input
                             type="datetime-local"
                             class="input input-bordered w-11/12"
-                            value={new Date(task.end_date)
-                                .toISOString()
-                                .slice(0, 16)}
-                            onInput={(e) =>
+                            value={dayjs(task.end_date).format(
+                                "YYYY-MM-DDThh:mm"
+                            )}
+                            onFocusOut={(e) =>
                                 setTask(
                                     "end_date",
-                                    new Date(e.target.value).valueOf()
+                                    new Date(e.target.value).toString()
                                 )
                             }
                         />
@@ -114,12 +116,37 @@ function TaskModal(props: TaskModalI) {
                         onInput={(e) => setTask("description", e.target.value)}
                     ></textarea>
                 </label>
-
+                <Show
+                    when={new Date(task.start_date) > new Date(task.end_date)}
+                >
+                    <div role="alert" class="alert alert-error mt-2">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="stroke-current shrink-0 h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                        <span>Start date must be before end date!</span>
+                    </div>
+                </Show>
                 <div class="modal-action">
-                    <div class="btn" onClick="newTaskModal.close()">
+                    <div class="btn" onClick={() => location.reload()}>
                         Close
                     </div>
-                    <button type="submit" class="btn">
+                    <button
+                        class="btn"
+                        type="submit"
+                        disabled={
+                            new Date(task.start_date) > new Date(task.end_date)
+                        }
+                    >
                         Save
                     </button>
                 </div>

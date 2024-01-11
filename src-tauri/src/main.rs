@@ -18,8 +18,8 @@ struct TaskI {
     id: i32,
     name: String,
     color: String,
-    start_date: i64,
-    end_date: i64,
+    start_date: String,
+    end_date: String,
     description: String,
 }
 

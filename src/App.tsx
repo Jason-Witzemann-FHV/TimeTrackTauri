@@ -21,8 +21,8 @@ function App() {
         name: "Your nice taskname",
         description: "Your awesome task description",
         color: "#123456",
-        start_date: new Date().valueOf() + 3600000,
-        end_date: new Date().valueOf() + 3600000 * 2,
+        start_date: new Date().toString(),
+        end_date: new Date().toString(),
     } as TaskI);
 
     const [presets] = createResource(fetchAllPresets);
@@ -65,7 +65,6 @@ function App() {
         if (filter.startsWith("date: ")) {
             const date = new Date(filter.split("date: ")[1]);
             date.setHours(0, 0, 0, 0);
-            console.log(date)
 
             const filtered = (tasks() as Array<TaskI>).filter((task) => {
                 const taskDate = new Date(task.start_date);
@@ -105,9 +104,26 @@ function App() {
                 />
             </Show>
             <Show when={isFiltered() && filteredTasks().length == 0}>
-                <div role="alert" class="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>Couldn't find any task with the current search term! <br/><b>Tip:</b> Search for 'date: YYYY-MM-DD' to filter by date</span>
+                <div role="alert" class="alert alert-info mt-3">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="stroke-current shrink-0 h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                    <span>
+                        Couldn't find any task with the current search term!{" "}
+                        <br />
+                        <b>Tip:</b> Search for 'date: YYYY-MM-DD' to filter by
+                        date
+                    </span>
                 </div>
             </Show>
         </div>
