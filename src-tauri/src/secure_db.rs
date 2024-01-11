@@ -154,3 +154,24 @@ pub fn read_preset_db() -> Vec<PresetI> {
 
     preset_list
 }
+
+// Unit Tests for encrypting and decrypting
+#[cfg(test)]
+mod tests {
+    use crate::secure_db::decrypt;
+    use crate::secure_db::encrypt;
+
+    #[test]
+    fn test_encrypt() {
+        let data = "Rust Unit Test!";
+        let encrypted_data = encrypt(data);
+        assert_eq!(encrypted_data, "\u{7} &!u\0;<!u\u{1}0&!t".to_string());
+    }
+
+    #[test]
+    fn test_decrypt() {
+        let data = "\u{7} &!u\0;<!u\u{1}0&!t";
+        let encrypted_data = decrypt(data);
+        assert_eq!(encrypted_data, "Rust Unit Test!".to_string());
+    }
+}
