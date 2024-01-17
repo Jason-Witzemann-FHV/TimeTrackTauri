@@ -1,4 +1,4 @@
-import { For, Show } from "solid-js";
+import { For, Show, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import "../App.css";
@@ -6,11 +6,14 @@ import { TaskI } from "../types/TaskI";
 import { TaskModalI } from "../types/TaskModalI";
 import { PresetI } from "../types/PresetI";
 import { invoke } from "@tauri-apps/api";
-import moment from "moment";
+
 import dayjs from "dayjs";
+import { effect } from "solid-js/web";
 
 function TaskModal(props: TaskModalI) {
     const [task, setTask] = createStore<TaskI>(props.task);
+    const [hasError, setHasError] = createSignal(false);
+    const [error, setError] = createSignal("");
 
     function applyPreset(preset: PresetI) {
         setTask("color", preset.color);
@@ -20,6 +23,31 @@ function TaskModal(props: TaskModalI) {
     async function submitForm(e: Event): Promise<void> {
         await invoke("save_task", { task: task });
     }
+
+    effect(() => {
+        if (new Date(task.start_date) > new Date(task.end_date)) {
+            setHasError(true);
+            setError("Start date must be before end date!");
+            return;
+        }
+        if (task.start_date === "Invalid Date") {
+            setHasError(true);
+            setError("Start date must be set!");
+            return;
+        }
+        if (task.end_date === "Invalid Date") {
+            setHasError(true);
+            setError("End date must be set!");
+            return;
+        }
+        if (task.name === "") {
+            setHasError(true);
+            setError("Task name must be set!");
+            return;
+        }
+
+        setHasError(false);
+    });
 
     return (
         <dialog id="newTaskModal" class="modal" ref={props.ref}>
@@ -39,7 +67,7 @@ function TaskModal(props: TaskModalI) {
                             onInput={(e) => setTask("name", e.target.value)}
                         />
                     </label>
-                    <label class="form-control w-1/2">
+                    <label class="form-control">
                         <div class="label">
                             <span class="label-text">Color</span>
                         </div>
@@ -116,9 +144,7 @@ function TaskModal(props: TaskModalI) {
                         onInput={(e) => setTask("description", e.target.value)}
                     ></textarea>
                 </label>
-                <Show
-                    when={new Date(task.start_date) > new Date(task.end_date)}
-                >
+                <Show when={hasError()}>
                     <div role="alert" class="alert alert-error mt-2">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -133,7 +159,7 @@ function TaskModal(props: TaskModalI) {
                                 d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
                             />
                         </svg>
-                        <span>Start date must be before end date!</span>
+                        <span>{error()}</span>
                     </div>
                 </Show>
                 <div class="modal-action">
