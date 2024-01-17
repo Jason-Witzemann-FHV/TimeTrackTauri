@@ -281,26 +281,6 @@ fn fill_preset_db() {
         color: "#ffff00".to_string(),
     };
     preset_list.add(preset);
-    let preset = PresetI {
-        name: "Preset 5".to_string(),
-        color: "#ff00ff".to_string(),
-    };
-    preset_list.add(preset);
-    let preset = PresetI {
-        name: "Preset 6".to_string(),
-        color: "#00ffff".to_string(),
-    };
-    preset_list.add(preset);
-    let preset = PresetI {
-        name: "Preset 7".to_string(),
-        color: "#ffffff".to_string(),
-    };
-    preset_list.add(preset);
-    let preset = PresetI {
-        name: "Preset 8".to_string(),
-        color: "#000000".to_string(),
-    };
-    preset_list.add(preset);
 
     write_preset_db(&preset_list.0);
 }
