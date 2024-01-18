@@ -23,22 +23,7 @@ struct TaskI {
     description: String,
 }
 
-struct TaskList(Vec<TaskI>);
 struct PresetList(Vec<PresetI>);
-
-impl TaskList {
-    fn new() -> Self {
-        TaskList(Vec::new())
-    }
-
-    fn add(&mut self, task: TaskI) {
-        self.0.push(task);
-    }
-
-    fn get(&self, index: usize) -> Option<&TaskI> {
-        self.0.get(index)
-    }
-}
 
 impl PresetList {
     fn new() -> Self {
@@ -47,10 +32,6 @@ impl PresetList {
 
     fn add(&mut self, preset: PresetI) {
         self.0.push(preset);
-    }
-
-    fn get(&self, index: usize) -> Option<&PresetI> {
-        self.0.get(index)
     }
 }
 

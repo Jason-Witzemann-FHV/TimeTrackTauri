@@ -1,6 +1,4 @@
 use std::fs;
-use std::fs::read_to_string;
-use std::fs::File;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
@@ -86,7 +84,7 @@ fn get_preset_db_path() -> String {
 // Write the data to the database file, after encrypting it.
 pub fn write_task_db(task_list: &Vec<TaskI>) {
     let db_path = get_task_db_path();
-    let mut db_file = OpenOptions::new().write(true).open(db_path);
+    let db_file = OpenOptions::new().write(true).open(db_path);
 
     match db_file {
         Ok(mut db_file) => {
@@ -125,7 +123,7 @@ pub fn write_task_db(task_list: &Vec<TaskI>) {
 
 pub fn write_preset_db(preset_list: &Vec<PresetI>) {
     let db_path = get_preset_db_path();
-    let mut db_file = OpenOptions::new().write(true).open(db_path);
+    let db_file = OpenOptions::new().write(true).open(db_path);
 
     match db_file {
         Ok(mut db_file) => {
