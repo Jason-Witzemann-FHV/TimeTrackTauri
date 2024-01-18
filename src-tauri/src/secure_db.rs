@@ -1,3 +1,4 @@
+use std::env;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -56,7 +57,11 @@ fn get_task_db_path() -> String {
             let dir_str = dir.to_str();
             match dir_str {
                 Some(dir_str) => {
-                    return dir_str.to_string() + "/.config/timetracktauri/task.secure"
+                    if env::var("SET_TEST_FILE").is_ok() {
+                        return dir_str.to_string() + "/.config/timetracktauri/test.secure";
+                    } else {
+                        return dir_str.to_string() + "/.config/timetracktauri/task.secure";
+                    }
                 }
                 None => panic!("Could not get home directory."),
             }
@@ -286,8 +291,27 @@ fn fill_preset_db() {
 // Unit Tests for encrypting and decrypting
 #[cfg(test)]
 mod tests {
+    use crate::secure_db::create_db_file;
+    use crate::secure_db::db_file_exists;
     use crate::secure_db::decrypt;
     use crate::secure_db::encrypt;
+    use crate::secure_db::get_task_db_path;
+    use crate::secure_db::read_task_db;
+    use crate::secure_db::write_task_db;
+
+    use crate::TaskI;
+
+    struct TaskList(Vec<TaskI>);
+
+    impl TaskList {
+        fn new() -> Self {
+            TaskList(Vec::new())
+        }
+
+        fn add(&mut self, task: TaskI) {
+            self.0.push(task);
+        }
+    }
 
     #[test]
     fn test_encrypt() {
@@ -301,5 +325,88 @@ mod tests {
         let data = "\u{7} &!u\0;<!u\u{1}0&!t";
         let encrypted_data = decrypt(data);
         assert_eq!(encrypted_data, "Rust Unit Test!".to_string());
+    }
+
+    fn generate_test_data() -> Vec<TaskI> {
+        let mut task_list = TaskList::new();
+        let task = TaskI {
+            id: 1,
+            name: "Auto fahren".to_string(),
+            color: "#ff0000".to_string(),
+            start_date: "Thu Jan 18 2024 09:55:10 GMT+0100 (Mitteleuropäische Normalzeit)"
+                .to_string(),
+            end_date: "Thu Jan 18 2024 10:55:10 GMT+0100 (Mitteleuropäische Normalzeit)"
+                .to_string(),
+            description: "This is a task".to_string(),
+        };
+        task_list.add(task);
+        let task = TaskI {
+            id: 2,
+            name: "Kunden beraten".to_string(),
+            color: "#00ff00".to_string(),
+            start_date: "Thu Jan 17 2024 09:55:10 GMT+0100 (Mitteleuropäische Normalzeit)"
+                .to_string(),
+            end_date: "Thu Jan 17 2024 10:55:10 GMT+0100 (Mitteleuropäische Normalzeit)"
+                .to_string(),
+            description: "This is another task".to_string(),
+        };
+        task_list.add(task);
+        let task = TaskI {
+            id: 3,
+            name: "Drucker einrichten".to_string(),
+            color: "#0000ff".to_string(),
+            start_date: "Thu Jan 17 2024 11:55:10 GMT+0100 (Mitteleuropäische Normalzeit)"
+                .to_string(),
+            end_date: "Thu Jan 17 2024 12:55:10 GMT+0100 (Mitteleuropäische Normalzeit)"
+                .to_string(),
+            description: "This is yet another task".to_string(),
+        };
+        task_list.add(task);
+        let task = TaskI {
+            id: 4,
+            name: "Task 4".to_string(),
+            color: "#ffff00".to_string(),
+            start_date: "Thu Jan 15 2024 06:55:10 GMT+0100 (Mitteleuropäische Normalzeit)"
+                .to_string(),
+            end_date: "Thu Jan 15 2024 10:55:10 GMT+0100 (Mitteleuropäische Normalzeit)"
+                .to_string(),
+            description: "This is yet another task".to_string(),
+        };
+        task_list.add(task);
+        return task_list.0;
+    }
+
+    fn remove_file() {
+        // remove file
+        let db_path = get_task_db_path();
+        match std::fs::remove_file(&db_path) {
+            Ok(_) => (),
+            Err(_) => panic!("Could not remove test file."),
+        }
+    }
+
+    fn setup_test_file() {
+        let db_path = get_task_db_path();
+        if db_file_exists(&db_path) {
+            remove_file();
+        }
+
+        // create file
+        create_db_file(&db_path);
+    }
+
+    #[test]
+    fn test_save_and_read_task() {
+        setup_test_file();
+        let task_list = generate_test_data();
+        println!("Task List: {:?}", task_list);
+
+        write_task_db(&task_list);
+        let check_list = read_task_db();
+        println!("Check List: {:?}", check_list);
+
+        assert_eq!(task_list.len(), check_list.len());
+
+        remove_file();
     }
 }

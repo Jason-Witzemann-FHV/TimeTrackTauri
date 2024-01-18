@@ -52,6 +52,7 @@ fn save_all_presets(presets: Vec<PresetI>) {
 
 #[tauri::command]
 fn save_task(task: TaskI) {
+    println!("Saving task: {:?}", task);
     let mut task_list = secure_db::read_task_db();
 
     // check if task already exists. If so, replace it. If not, add it.
