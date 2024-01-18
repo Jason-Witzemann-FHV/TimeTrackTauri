@@ -2,6 +2,12 @@
 
 Install the development requirements as described in this [article](https://tauri.app/v1/guides/getting-started/prerequisites#installing).
 
+Install the npm dependencies:
+
+```bash
+npm install
+```
+
 ## Building the application
 
 Run the following command after installing the requirements:
@@ -32,3 +38,7 @@ Running backend integration tests:
 cd ./src-tauri/
 cargo test
 ```
+
+## Known Issues
+
+-   End2End tests (File: `test/test.cjs`) not working --> Webdriver client can't connect to tauri-driver instance

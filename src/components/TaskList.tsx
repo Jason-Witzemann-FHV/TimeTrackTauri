@@ -58,7 +58,7 @@ function TaskList(props: {
                 hour: "numeric",
                 minute: "numeric",
             }) +
-            " - " +
+            " -> " +
             end_date.toLocaleTimeString("de-DE", {
                 hour: "numeric",
                 minute: "numeric",
@@ -66,6 +66,22 @@ function TaskList(props: {
             " " +
             task.name;
 
+        start_date.setHours(0, 0, 0, 0);
+        end_date.setHours(0, 0, 0, 0);
+
+        if (start_date.getTime() !== end_date.getTime()) {
+            label = label.replace(
+                " -> ",
+                " -> " +
+                    end_date.getDate() +
+                    "." +
+                    end_date.getMonth() +
+                    1 +
+                    "." +
+                    end_date.getFullYear() +
+                    " "
+            );
+        }
         return label;
     }
 
