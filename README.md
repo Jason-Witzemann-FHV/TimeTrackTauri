@@ -2,6 +2,12 @@
 
 Install the development requirements as described in this [article](https://tauri.app/v1/guides/getting-started/prerequisites#installing).
 
+Install the npm dependencies:
+
+```bash
+npm install
+```
+
 ## Building the application
 
 Run the following command after installing the requirements:
