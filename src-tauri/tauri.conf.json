@@ -37,8 +37,8 @@
                 "fullscreen": false,
                 "resizable": true,
                 "title": "time-track-tauri",
-                "width": 900,
-                "height": 700
+                "minWidth": 900,
+                "minHeight": 700
             }
         ]
     }
