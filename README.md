@@ -32,3 +32,7 @@ Running backend integration tests:
 cd ./src-tauri/
 cargo test
 ```
+
+## Known Issues
+
+-   End2End tests (File: `test/test.cjs`) not working --> Webdriver client can't connect to tauri-driver instance

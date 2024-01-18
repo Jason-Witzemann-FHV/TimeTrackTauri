@@ -3,8 +3,6 @@ import { fireEvent, render } from "@solidjs/testing-library";
 import "@testing-library/jest-dom";
 import TaskList from "../components/TaskList";
 import { TaskI } from "../types/TaskI";
-import { invoke } from "@tauri-apps/api";
-import { createResource } from "solid-js";
 
 // Source: https://yonatankra.com/how-to-setup-vitest-in-a-tauri-project/
 describe("<TaskList />", () => {
