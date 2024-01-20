@@ -65,3 +65,4 @@ SET_TEST_FILE=1 cargo test
 - Datetimelocal picker is not working on Linux and Mac due to issues with the underlying webview
 - End2End tests (File: `test/test.cjs`) not working --> Webdriver client can't connect to tauri-driver instance
 - Integration tests are supposed to be in a separate folder (/src-tauri/tests) but are currently in the same file as the unit tests due to organizational issues. The size of this project is small enough to justify the combination of unit and integration tests.
+- The rust backend contains two functions called `read_task_db` and `read_preset_db`. They have the exact same logic but separate data types. We could not refactor it to a function version that works with generics, as we did with the `write_to_db` function, because we lacked advanced Rust knowledge.
