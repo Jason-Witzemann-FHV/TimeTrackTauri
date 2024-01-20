@@ -4,18 +4,20 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 
+use serde::Serialize;
+
 use crate::PresetI;
 use crate::PresetList;
 use crate::TaskI;
 
 // Check if a database files exist, and create them if they do not.
 pub fn init() {
-    let db_path = get_task_db_path();
+    let db_path = get_db_path("task");
     if !db_file_exists(&db_path) {
         create_db_file(&db_path);
     }
 
-    let db_path = get_preset_db_path();
+    let db_path = get_db_path("preset");
     if !db_file_exists(&db_path) {
         create_db_file(&db_path);
         fill_preset_db();
@@ -49,8 +51,8 @@ fn db_file_exists(db_path: &str) -> bool {
     Path::new(db_path).exists()
 }
 
-// Get the path where the database file should be located.
-fn get_task_db_path() -> String {
+// Get the database path. If the environment variable SET_TEST_FILE is set, use the test database. Otherwise, use the normal database with "task" or "preset".
+fn get_db_path(db: &str) -> String {
     let home_dir = dirs::home_dir();
     match home_dir {
         Some(dir) => {
@@ -59,8 +61,15 @@ fn get_task_db_path() -> String {
                 Some(dir_str) => {
                     if env::var("SET_TEST_FILE").is_ok() {
                         return dir_str.to_string() + "/.config/timetracktauri/test.secure";
-                    } else {
-                        return dir_str.to_string() + "/.config/timetracktauri/task.secure";
+                    }
+                    match db {
+                        "task" => {
+                            return dir_str.to_string() + "/.config/timetracktauri/task.secure"
+                        }
+                        "preset" => {
+                            return dir_str.to_string() + "/.config/timetracktauri/preset.secure"
+                        }
+                        _ => panic!("Invalid database name."),
                     }
                 }
                 None => panic!("Could not get home directory."),
@@ -70,37 +79,19 @@ fn get_task_db_path() -> String {
     }
 }
 
-fn get_preset_db_path() -> String {
-    let home_dir = dirs::home_dir();
-    match home_dir {
-        Some(dir) => {
-            let dir_str = dir.to_str();
-            match dir_str {
-                Some(dir_str) => {
-                    return dir_str.to_string() + "/.config/timetracktauri/preset.secure"
-                }
-                None => panic!("Could not get home directory."),
-            }
-        }
-        None => panic!("Could not get home directory."),
-    }
-}
-
-// Write the data to the database file, after encrypting it.
-pub fn write_task_db(task_list: &Vec<TaskI>) {
-    let db_path = get_task_db_path();
+fn write_to_db<T: Serialize>(db_path: &str, data_list: &Vec<T>) {
     let db_file = OpenOptions::new().write(true).open(db_path);
 
     match db_file {
         Ok(mut db_file) => {
             let mut encrypted_data = Vec::new();
 
-            for task in task_list {
-                let task_json = serde_json::to_string(&task);
-                match task_json {
-                    Ok(task_json) => {
-                        let encrypted_task = encrypt(&task_json);
-                        encrypted_data.push(encrypted_task);
+            for data_entry in data_list {
+                let data_json = serde_json::to_string(&data_entry);
+                match data_json {
+                    Ok(data_json) => {
+                        let encrypted_string = encrypt(&data_json);
+                        encrypted_data.push(encrypted_string);
                     }
                     Err(_) => panic!("Could not serialize task."),
                 }
@@ -126,43 +117,15 @@ pub fn write_task_db(task_list: &Vec<TaskI>) {
     }
 }
 
+// Write the data to the database file, after encrypting it.
+pub fn write_task_db(task_list: &Vec<TaskI>) {
+    let db_path = get_db_path("task");
+    write_to_db(&db_path, task_list);
+}
+
 pub fn write_preset_db(preset_list: &Vec<PresetI>) {
-    let db_path = get_preset_db_path();
-    let db_file = OpenOptions::new().write(true).open(db_path);
-
-    match db_file {
-        Ok(mut db_file) => {
-            let mut encrypted_data = Vec::new();
-
-            for preset in preset_list {
-                let preset_json = serde_json::to_string(&preset);
-                match preset_json {
-                    Ok(preset_json) => {
-                        let encrypted_preset = encrypt(&preset_json);
-                        encrypted_data.push(encrypted_preset);
-                    }
-                    Err(_) => panic!("Could not serialize preset."),
-                }
-            }
-
-            let encrypted_data_json = serde_json::to_string(&encrypted_data);
-            match encrypted_data_json {
-                Ok(encrypted_data_json) => {
-                    let encrypted_data_json: String = encrypted_data_json;
-                    match db_file.set_len(0) {
-                        Ok(_) => (),
-                        Err(_) => panic!("Could not truncate database file."),
-                    };
-                    match db_file.write_all(encrypted_data_json.as_bytes()) {
-                        Ok(_) => (),
-                        Err(_) => panic!("Could not write to database file."),
-                    };
-                }
-                Err(_) => panic!("Could not serialize encrypted data."),
-            }
-        }
-        Err(_) => panic!("Could not open database file."),
-    }
+    let db_path = get_db_path("preset");
+    write_to_db(&db_path, preset_list);
 }
 
 fn encrypt(data: &str) -> String {
@@ -191,7 +154,7 @@ fn decrypt(data: &str) -> String {
 
 // Read the data from the database file, after decrypting it.
 pub fn read_task_db() -> Vec<TaskI> {
-    let db_path = get_task_db_path();
+    let db_path = get_db_path("task");
 
     let mut task_list = Vec::new();
 
@@ -227,8 +190,7 @@ pub fn read_task_db() -> Vec<TaskI> {
 }
 
 pub fn read_preset_db() -> Vec<PresetI> {
-    let db_path = get_preset_db_path();
-
+    let db_path = get_db_path("preset");
     let mut preset_list = Vec::new();
 
     let encrypted_data_json = fs::read_to_string(db_path);
