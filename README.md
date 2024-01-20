@@ -1,6 +1,9 @@
 ## Requirements
 
-Install the development requirements as described in this [article](https://tauri.app/v1/guides/getting-started/prerequisites#installing).
+Install Rust, Node and NPM or follow the installation guide on this [article](https://tauri.app/v1/guides/getting-started/prerequisites#installing). We tested the application with the following versions:
+rustc: 1.74.0
+node: v16.13.2
+npm: 8.3.1
 
 Install the npm dependencies:
 
